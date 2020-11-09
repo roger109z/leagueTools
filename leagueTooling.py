@@ -1,6 +1,7 @@
 import requests
 import socket
 import os
+import keyboard
 
 #so we don't have to see those pesky warnings telling me that localhost has no ssl certs
 import urllib3
@@ -34,9 +35,23 @@ url = getURL(riotDirectory)
 
 print("url is: " + url)
 
-print(getAuthToken(url))
+#print(getAuthToken(url))
 
+def acceptQueue():
+    print("acceptQueue")
 
+def waitForKeys():
+    while True:
+        try:
+            if keyboard.is_pressed('space'):
+                acceptQueue()
+                
+            elif keyboard.is_pressed('q'):
+                break
+        except:
+            break
+
+waitForKeys()
 
 #
 
