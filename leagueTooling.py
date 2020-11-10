@@ -1,5 +1,6 @@
 import requests
 import socket
+import time
 import os
 
 
@@ -12,18 +13,47 @@ class leagueAPI:
     endpoints = {
         "auth": "/riotclient/auth-token",
         "runes": "/lol-perks/v1/pages",
-        "acceptQueue": "/lol-matchmaking/v1/ready-check/decline"
+        "acceptQueue": "/lol-matchmaking/v1/ready-check/accept",
+        "rejectQueue": "/lol-matchmaking/v1/ready-check/accept",
+        "echo": "/lol-game-session/v1/echo"
     }
 
 
     def __init__(self, dir=None, url=None):
+        
         if not url:
             if not dir:
                 dir = "C:\\Riot Games\\League of Legends\\Logs\\LeagueClient Logs"
             self.url = self.getURL(dir)
         print("url is: " + self.url)
 
-        self.authToken = self.getAuthToken()
+        if self.isRunning():
+            self.authToken = self.getAuthToken()
+
+            self.gamestate = self.getGamestate()
+
+    def isRunning(self):
+        out = True
+        try:
+            (requests.get(self.url + self.endpoints['echo'], verify=False))
+        except requests.exceptions.ConnectionError:
+            out = False
+        return out
+            
+
+    def mainLoop(self, updateSpeed=2000):
+        delay = 1/(updateSpeed/60)
+        lastGamestate = ""
+        while True:
+            if not self.isRunning():
+                print("Game Closed")
+                break
+            #if lastGamestate != self.gamestate
+            time.sleep(delay)
+
+
+    def getGamestate(self):
+        return "menu"
 
     def getURL(self, dir):
         files = os.listdir(dir)
@@ -39,5 +69,10 @@ class leagueAPI:
         return requests.get(self.url+self.endpoints["auth"], verify=False).text
 
     def acceptQueue(self):
+        print("accepting queue")
         return requests.post(self.url + self.endpoints["acceptQueue"], verify=False)
+
+    def rejectQueue(self):
+        print("rejecting queue")
+        return requests.post(self.url + self.endpoints["rejectQueue"], verify=False)
 

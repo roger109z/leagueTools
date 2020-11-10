@@ -1,16 +1,14 @@
 import leagueTooling
 import keyboard
+import time
 
 def waitForKeys():
+
     api = leagueTooling.leagueAPI()
-    while True:
-        try:
-            if keyboard.is_pressed('space'):
-                print(api.acceptQueue())
-                
-            elif keyboard.is_pressed('q'):
-                break
-        except:
-            break
+
+    keyboard.add_hotkey('space', lambda: api.acceptQueue())
+    keyboard.add_hotkey('backspace', lambda: api.rejectQueue())
+
+    api.mainLoop()
 
 waitForKeys()
