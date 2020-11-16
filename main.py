@@ -139,6 +139,9 @@ bar = ttk.Label(statusBar, text="Menu")
 bar.grid(column=0, row=3, sticky=(tk.S))
 ################
 
+icon = tk.PhotoImage(file='icon.png')
+win.tk.call('wm', 'iconphoto', win._w, icon)
+
 updateSpeed = 1000
 win.after(updateSpeed, updateInfo)
 win.after(updateSpeed, checkAlive, clientLoop, win, updateSpeed)
