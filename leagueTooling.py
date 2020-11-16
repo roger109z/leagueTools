@@ -17,7 +17,8 @@ class leagueAPI:
         "rejectQueue": "/lol-matchmaking/v1/ready-check/decline",
         "echo": "/lol-game-session/v1/echo",
         "session": "/lol-gameflow/v1/session",
-        "gameflowPhase": "/lol-gameflow/v1/gameflow-phase"
+        "gameflowPhase": "/lol-gameflow/v1/gameflow-phase",
+        "currentPage": "/lol-perks/v1/currentpage"
         
     }
 
@@ -77,6 +78,11 @@ class leagueAPI:
         print("Game Closed")
 
 
+    def setRunePage(self, page):
+        if self.getCurrentRunepage()['isEditable']:
+            print(requests.delete(self.url + self.endpoints["runes"] + "/" + str(self.getCurrentRunepage()['id']), verify=False).text)
+            print(requests.post(self.url+self.endpoints["runes"], json=page, verify = False).text)
+
     def getGamestate(self):
         resp = requests.get(self.url + self.endpoints['session'], verify=False).json()
 
@@ -96,6 +102,20 @@ class leagueAPI:
                     url += contents.split("https://riot:")[1].split('/')[0]
                     return url
         
+    def getRunepageInfo(self):
+        tmpPages = requests.get(self.url+self.endpoints["runes"], verify=False).json()
+        outPages = []
+        for page in tmpPages:
+            if page["isEditable"]:
+                outPages.append(page)
+        return outPages
+        
+    def getCurrentRunepage(self):
+        pages = self.getRunepageInfo()
+        for page in pages:
+            if page["current"]:
+                return page
+
     def getAuthToken(self):
         return requests.get(self.url+self.endpoints["auth"], verify=False).text
 
